@@ -9,15 +9,26 @@ https://bitbucket.org/preqindevelopment/preqin-fullstack-interview-task/src/main
 - `npm run setup`
 
 ## Set Up
-- In database_creation, add `db_config.json`, contains postgres login username
+- Create .env with following format:
 ```
-{
-    "user": "xxxx",
-    "db_name": "investors"
-}
+DB_NAME=investors
+DB_USER=leehaowei
+DB_PASSWORD=yourpassword
+DB_HOST=localhost
+DB_PORT=5432
+
+TABLE_NAME=investor_table
+
+REACT_APP_API_BASE_URL=http://localhost:8000
 ```
-- Run `CREATE DATABASE investors`, manually create a investors database
-- Run `import_csv.py`, this will import the csv into the postgres database
+
+### backend
+- `cd backend`
+- `poetry install`
+- `eval $(poetry env activate)`
+- `cd db`
+- Run `CREATE DATABASE investors`, manually create investors database
+- Run `setup.py`, this will import the csv into the postgres database
 
 ## Runs
 ### Running backend

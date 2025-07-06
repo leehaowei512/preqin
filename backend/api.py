@@ -3,10 +3,11 @@ from fastapi import HTTPException, Depends
 from sqlalchemy import func, union_all, literal
 from sqlalchemy.orm import Session
 from starlette import status
-import models
 import schemas
 from fastapi import APIRouter
 from database import get_db
+
+import models
 
 router = APIRouter(
     prefix='/investors',
@@ -22,14 +23,14 @@ def get_investor_summary(db: Session = Depends(get_db)):
     :return:
     """
     investors = db.query(
-        models.Investor.investorname.label("investor_name"),
-        models.Investor.investorytype.label("investory_type"),
-        func.min(models.Investor.investordateadded).label("investor_date_added"),
-        func.sum(models.Investor.commitmentamount).label("commitment_amount")
+        models.Investor.investor_name,
+        models.Investor.investory_type,
+        func.min(models.Investor.investor_date_added),
+        func.sum(models.Investor.commitment_amount)
     ).group_by(
-        models.Investor.investorname,
-        models.Investor.investorytype,
-        models.Investor.commitmentcurrency
+        models.Investor.investor_name,
+        models.Investor.investory_type,
+        models.Investor.commitment_currency
     ).all()
 
     if investors is None:
@@ -38,7 +39,8 @@ def get_investor_summary(db: Session = Depends(get_db)):
     return investors
 
 
-@router.get('/investor_name/{investor_name}', status_code=status.HTTP_200_OK, response_model=List[schemas.GetInvestorCommitments])
+@router.get('/investor_name/{investor_name}', status_code=status.HTTP_200_OK, response_model=List[
+    schemas.GetInvestorCommitments])
 def get_all_commitments_for_investor(investor_name: str, db: Session = Depends(get_db)):
     """
     Given investor name, get all commitments
@@ -47,11 +49,11 @@ def get_all_commitments_for_investor(investor_name: str, db: Session = Depends(g
     :return:
     """
     investor_commitments = db.query(
-        models.Investor.commitmentassetclass.label("commitment_asset_class"),
-        models.Investor.commitmentcurrency.label("commitment_currency"),
-        models.Investor.commitmentamount.label("commitment_amount")
+        models.Investor.commitment_asset_class,
+        models.Investor.commitment_currency,
+        models.Investor.commitment_amount
     ).filter(
-        models.Investor.investorname == investor_name
+        models.Investor.investor_name == investor_name
     ).all()
 
     if investor_commitments is None:
@@ -60,7 +62,8 @@ def get_all_commitments_for_investor(investor_name: str, db: Session = Depends(g
     return investor_commitments
 
 
-@router.get('/investor_name/{investor_name}/summary', status_code=status.HTTP_200_OK, response_model=List[schemas.GetInvestorCommitmentSummary])
+@router.get('/investor_name/{investor_name}/summary', status_code=status.HTTP_200_OK, response_model=List[
+    schemas.GetInvestorCommitmentSummary])
 def get_all_commitment_summary_for_investor(investor_name: str, db: Session = Depends(get_db)):
     """
     Given investor name, get all commitments grouped by asset classes
@@ -71,11 +74,11 @@ def get_all_commitment_summary_for_investor(investor_name: str, db: Session = De
     # First query - grouped by asset class
     asset_class_query = (
         db.query(
-            models.Investor.commitmentassetclass.label("asset_class"),
-            func.sum(models.Investor.commitmentamount).label("amount")
+            models.Investor.commitment_asset_class.label("asset_class"),
+            func.sum(models.Investor.commitment_amount).label("amount")
         )
-        .filter(models.Investor.investorname == 'Cza Weasley fund')
-        .group_by(models.Investor.commitmentassetclass)
+        .filter(models.Investor.investor_name == 'Cza Weasley fund')
+        .group_by(models.Investor.commitment_asset_class)
     )
 
     if asset_class_query is None:
@@ -86,9 +89,9 @@ def get_all_commitment_summary_for_investor(investor_name: str, db: Session = De
     total_query = (
         db.query(
             literal("all").label("asset_class"),
-            func.sum(models.Investor.commitmentamount).label("amount")
+            func.sum(models.Investor.commitment_amount).label("amount")
         )
-        .filter(models.Investor.investorname == 'Cza Weasley fund')
+        .filter(models.Investor.investor_name == 'Cza Weasley fund')
     )
 
     # Combine with UNION ALL (more efficient than UNION in this case)

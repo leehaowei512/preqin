@@ -1,9 +1,9 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from database import engine
 
 import models
-import crud_operations
-from database import engine, get_db
+import api
 
 app = FastAPI()
 
@@ -11,7 +11,7 @@ app = FastAPI()
 models.Base.metadata.create_all(bind=engine)
 
 # Include the router from crud_operations
-app.include_router(crud_operations.router)
+app.include_router(api.router)
 
 # Add CORS middleware
 app.add_middleware(
