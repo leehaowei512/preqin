@@ -25,7 +25,7 @@ def get_config() -> dict:
 # Database connection
 conn = psycopg2.connect(
     user=get_config().get("user"),
-    dbname="investors"
+    dbname=get_config().get("db_name")
     # host="localhost",
     # port=5432
 )
