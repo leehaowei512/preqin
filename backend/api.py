@@ -22,21 +22,21 @@ def get_investor_summary(db: Session = Depends(get_db)):
     :param db:
     :return:
     """
-    investors = db.query(
+    results = db.query(
         models.Investor.investor_name,
         models.Investor.investory_type,
-        func.min(models.Investor.investor_date_added),
-        func.sum(models.Investor.commitment_amount)
+        func.min(models.Investor.investor_date_added).label("investor_date_added"),
+        func.sum(models.Investor.commitment_amount).label("commitment_amount")
     ).group_by(
         models.Investor.investor_name,
         models.Investor.investory_type,
         models.Investor.commitment_currency
     ).all()
 
-    if investors is None:
+    if results is None:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
                             detail=f"The investors data you requested for does not exist")
-    return investors
+    return results
 
 
 @router.get('/investor_name/{investor_name}', status_code=status.HTTP_200_OK, response_model=List[
