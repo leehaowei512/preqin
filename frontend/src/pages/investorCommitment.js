@@ -7,14 +7,13 @@ import {
   TableRow,
   Paper,
   Typography,
-  ButtonGroup,
-  Button,
   IconButton
 } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useParams, useNavigate } from 'react-router-dom';
 import { fetchInvestorCommitments, fetchInvestorSummary } from '../api/investorApi';
 import { formatAmount } from '../utils/formatUtils';
+import InvestorCommitmentSummaryButtons from '../component/investorCommitmentSummaryButtonGroup';
 
 const InvestorCommitments = () => {
   const { investor_name } = useParams();
@@ -56,8 +55,6 @@ const InvestorCommitments = () => {
         <IconButton
           onClick={() => navigate('/investors')}
           color="primary"
-          aria-label="back to investors"
-          sx={{ mr: 2 }}
         >
           <ArrowBackIcon />
         </IconButton>
@@ -66,44 +63,30 @@ const InvestorCommitments = () => {
         </Typography>
       </div>
 
-      <ButtonGroup variant="contained" sx={{ mb: 3, flexWrap: 'wrap' }}>
-        <Button
-          onClick={() => setActiveFilter('all')}
-          color={activeFilter === 'all' ? 'primary' : 'inherit'}
-        >
-          All ({commitments.length})
-        </Button>
-
-        {summary.map((item) => (
-          <Button
-            key={item.asset_class}
-            onClick={() => setActiveFilter(item.asset_class)}
-            color={activeFilter === item.asset_class ? 'primary' : 'inherit'}
-          >
-            {item.asset_class} ({formatAmount(item.amount)})
-          </Button>
-        ))}
-      </ButtonGroup>
+      <InvestorCommitmentSummaryButtons
+        commitments={commitments}
+        summary={summary}
+        activeFilter={activeFilter}
+        setActiveFilter={setActiveFilter}
+      />
 
       <Paper elevation={3}>
         <Table>
           <TableHead>
             <TableRow sx={{ backgroundColor: '#f5f5f5' }}>
-              <TableCell sx={{ fontWeight: 'bold', p: '12px' }}>ID</TableCell>
-              <TableCell sx={{ fontWeight: 'bold', p: '12px' }}>Asset Class</TableCell>
-              <TableCell sx={{ fontWeight: 'bold', p: '12px' }}>Currency</TableCell>
-              <TableCell align="right" sx={{ fontWeight: 'bold', p: '12px' }}>Amount</TableCell>
+              <TableCell>ID</TableCell>
+              <TableCell>Asset Class</TableCell>
+              <TableCell>Currency</TableCell>
+              <TableCell>Amount</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {filteredCommitments.map((commitment, index) => (
-              <TableRow key={index} hover sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
-                <TableCell sx={{ p: '12px' }}>{index + 1}</TableCell>
-                <TableCell sx={{ p: '12px' }}>{commitment.commitment_asset_class}</TableCell>
-                <TableCell sx={{ p: '12px' }}>{commitment.commitment_currency}</TableCell>
-                <TableCell align="right" sx={{ p: '12px' }}>
-                  {formatAmount(commitment.commitment_amount)}
-                </TableCell>
+              <TableRow key={index} hover>
+                <TableCell>{commitment.id}</TableCell>
+                <TableCell>{commitment.commitment_asset_class}</TableCell>
+                <TableCell>{commitment.commitment_currency}</TableCell>
+                <TableCell>{formatAmount(commitment.commitment_amount)}</TableCell>
               </TableRow>
             ))}
           </TableBody>

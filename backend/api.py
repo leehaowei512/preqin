@@ -49,6 +49,7 @@ def get_all_commitments_for_investor(investor_name: str, db: Session = Depends(g
     :return:
     """
     investor_commitments = db.query(
+        models.Investor.id,
         models.Investor.commitment_asset_class,
         models.Investor.commitment_currency,
         models.Investor.commitment_amount
