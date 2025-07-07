@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 import {
   Table,
   TableBody,
@@ -10,10 +9,12 @@ import {
   Paper,
   TableSortLabel,
   TablePagination,
-  TextField
+  TextField,
+  Typography
 } from '@mui/material';
-import { format } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
+import { fetchInvestors } from '../api/investorApi';
+import { formatAmount, formatDate } from '../utils/formatUtils';
 
 const InvestorsTable = () => {
   const [investors, setInvestors] = useState([]);
@@ -27,17 +28,17 @@ const InvestorsTable = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchInvestors = async () => {
+    const loadInvestors = async () => {
       try {
-        const response = await axios.get('http://localhost:8000/investors/');
-        setInvestors(response.data);
+        const data = await fetchInvestors();
+        setInvestors(data);
       } catch (err) {
         setError(err.message);
       } finally {
         setLoading(false);
       }
     };
-    fetchInvestors();
+    loadInvestors();
   }, []);
 
   const handleRequestSort = (property) => {
@@ -46,13 +47,15 @@ const InvestorsTable = () => {
     setOrderBy(property);
   };
 
-  const handleChangePage = (event, newPage) => {
-    setPage(newPage);
-  };
+  const handleChangePage = (_, newPage) => setPage(newPage);
 
   const handleChangeRowsPerPage = (event) => {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
+  };
+
+  const handleNameClick = (investorName) => {
+    navigate(`/investor/${encodeURIComponent(investorName)}`);
   };
 
   const filteredInvestors = investors.filter(investor =>
@@ -60,33 +63,23 @@ const InvestorsTable = () => {
     investor.investory_type.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const handleNameClick = (investorName) => {
-    navigate(`/investor/${encodeURIComponent(investorName)}`);
-  };
-
-  const sortedInvestors = filteredInvestors.sort((a, b) => {
-    if (order === 'asc') {
-      return a[orderBy] > b[orderBy] ? 1 : -1;
-    } else {
-      return a[orderBy] < b[orderBy] ? 1 : -1;
-    }
+  const sortedInvestors = [...filteredInvestors].sort((a, b) => {
+    const compare = a[orderBy].localeCompare(b[orderBy]);
+    return order === 'asc' ? compare : -compare;
   });
 
-  const formatCurrency = (amount) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0
-    }).format(amount).replace('$', '') + 'B';
-  };
+  const visibleInvestors = sortedInvestors.slice(
+    page * rowsPerPage,
+    page * rowsPerPage + rowsPerPage
+  );
 
-  if (loading) return <div className="text-center py-8">Loading...</div>;
-  if (error) return <div className="text-center py-8 text-red-500">Error: {error}</div>;
+  if (loading) return <Typography align="center" py={4}>Loading...</Typography>;
+  if (error) return <Typography align="center" py={4} color="error">Error: {error}</Typography>;
 
   return (
-    <div className="p-8">
-      <h1 className="text-3xl font-bold text-gray-800">Investors</h1>
+    <div style={{ padding: 32 }}>
+      <Typography variant="h4" gutterBottom>Investors</Typography>
+
       <TextField
         label="Search Investors"
         variant="outlined"
@@ -95,7 +88,7 @@ const InvestorsTable = () => {
         onChange={(e) => setSearchTerm(e.target.value)}
       />
 
-      <Paper elevation={3} className="overflow-hidden">
+      <Paper elevation={3} style={{ overflow: 'hidden' }}>
         <TableContainer>
           <Table stickyHeader aria-label="investors table">
             <TableHead>
@@ -109,59 +102,29 @@ const InvestorsTable = () => {
                     Name
                   </TableSortLabel>
                 </TableCell>
-                <TableCell>
-                  <TableSortLabel
-                    active={orderBy === 'investory_type'}
-                    direction={orderBy === 'investory_type' ? order : 'asc'}
-                    onClick={() => handleRequestSort('investory_type')}
-                  >
-                    Type
-                  </TableSortLabel>
-                </TableCell>
-                <TableCell>
-                  <TableSortLabel
-                    active={orderBy === 'investor_date_added'}
-                    direction={orderBy === 'investor_date_added' ? order : 'asc'}
-                    onClick={() => handleRequestSort('investor_date_added')}
-                  >
-                    Date Added
-                  </TableSortLabel>
-                </TableCell>
-                <TableCell>Address</TableCell>
-                <TableCell align="right">
-                  <TableSortLabel
-                    active={orderBy === 'commitment_amount'}
-                    direction={orderBy === 'commitment_amount' ? order : 'asc'}
-                    onClick={() => handleRequestSort('commitment_amount')}
-                  >
-                    Total Commitment
-                  </TableSortLabel>
+                <TableCell> Type </TableCell>
+                <TableCell> Date Added </TableCell>
+                <TableCell> Total Commitment
                 </TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
-              {sortedInvestors
-                .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                .map((investor, index) => (
-                  <TableRow hover key={index}>
-                    <TableCell>
-                        <span
-                        style={{
-                          color: '#1976d2',
-                          cursor: 'pointer',
-                          textDecoration: 'underline'
-                        }}
-                        onClick={() => handleNameClick(investor.investor_name)}
-                      >
-                        {investor.investor_name}
-                      </span>
-                    </TableCell>
-                    <TableCell>{investor.investory_type}</TableCell>
-                    <TableCell>{format(new Date(investor.investor_date_added), 'MMM dd, yyyy')}</TableCell>
-                    <TableCell>{investor.address || 'N/A'}</TableCell>
-                    <TableCell align="right">{formatCurrency(investor.commitment_amount)}</TableCell>
-                  </TableRow>
-                ))}
+              {visibleInvestors.map((investor) => (
+                <TableRow hover key={investor.investor_name}>
+                  <TableCell>
+                    <Typography
+                      color="primary"
+                      style={{ cursor: 'pointer', textDecoration: 'underline' }}
+                      onClick={() => handleNameClick(investor.investor_name)}
+                    >
+                      {investor.investor_name}
+                    </Typography>
+                  </TableCell>
+                  <TableCell>{investor.investory_type}</TableCell>
+                  <TableCell>{formatDate(investor.investor_date_added)}</TableCell>
+                  <TableCell>{formatAmount(investor.commitment_amount)}</TableCell>
+                </TableRow>
+              ))}
             </TableBody>
           </Table>
         </TableContainer>

@@ -1,7 +1,7 @@
 import './App.css';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Investors from './pages/Investors';
-import InvestorCommitments from './pages/investor_commitment'
+import InvestorCommitments from './pages/investorCommitment'
 
 function App() {
   return (
