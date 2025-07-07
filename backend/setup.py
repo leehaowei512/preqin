@@ -1,6 +1,7 @@
 # setup.py
-import psycopg2
 import csv
+
+import psycopg2
 
 from config import Config
 
@@ -22,12 +23,13 @@ class DatabaseImporter:
             user=Config.DB_USER,
             password=Config.DB_PASSWORD,
             host=Config.DB_HOST,
-            port=Config.DB_PORT
+            port=Config.DB_PORT,
         )
 
     def create_table(self) -> None:
         """Create table with proper schema"""
-        self.cur.execute(f"""
+        self.cur.execute(
+            f"""
            CREATE TABLE IF NOT EXISTS {self.table_name} (
                id SERIAL PRIMARY KEY,
                investor_name VARCHAR(100),
@@ -39,24 +41,28 @@ class DatabaseImporter:
                commitment_amount INTEGER,
                commitment_currency VARCHAR(3)
            );
-       """)
+       """
+        )
         self.conn.commit()
 
     def import_csv(self, csv_path: str) -> None:
         """Bulk insert CSV data"""
+
         def decompose_row(values: list) -> str:
             print(f"length: {len(values)}")
-            output = ', '.join(f"'{value}'" for value in values)
+            output = ", ".join(f"'{value}'" for value in values)
             print(output)
             return output
 
-        with open(csv_path, 'r') as f:
+        with open(csv_path, "r") as f:
             reader = csv.reader(f)
             next(reader)  # Skip header
             for index, row in enumerate(reader):
                 row_cleaned = decompose_row(row)
 
-                insert_query = f'INSERT INTO {self.table_name} VALUES ({index}, {row_cleaned})'
+                insert_query = (
+                    f"INSERT INTO {self.table_name} VALUES ({index}, {row_cleaned})"
+                )
                 self.cur.execute(insert_query)
         self.conn.commit()
 
