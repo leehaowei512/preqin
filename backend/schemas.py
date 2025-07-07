@@ -14,6 +14,7 @@ class GetInvestorSummary(BaseModel):
 
 
 class GetInvestorCommitments(BaseModel):
+    id: int
     commitment_asset_class: str
     commitment_currency: str
     commitment_amount: int
