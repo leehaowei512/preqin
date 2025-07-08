@@ -43,7 +43,7 @@ REACT_APP_API_BASE_URL=http://localhost:8000
 ## Run
 ### Running backend
 - `cd backend`
-- `uvicorn main:app --reload`
+- `uvicorn main:app --reload` ASGI web server
 
 ### Running frontend
 - `cd frontend`
@@ -51,10 +51,9 @@ REACT_APP_API_BASE_URL=http://localhost:8000
 
 # Results
 ## Investors Page
-![Screenshot 2025-07-08 at 22.21.57.png](..%2F..%2F..%2F..%2Fvar%2Ffolders%2Flg%2Fbnbbc61n1z39y5g06ptlhccw0000gn%2FT%2FTemporaryItems%2FNSIRD_screencaptureui_dBeRmH%2FScreenshot%202025-07-08%20at%2022.21.57.png)
-
+![investors.png](investors.png)
 ## Investor Commitment Page
-![Screenshot 2025-07-08 at 22.22.23.png](..%2F..%2F..%2F..%2Fvar%2Ffolders%2Flg%2Fbnbbc61n1z39y5g06ptlhccw0000gn%2FT%2FTemporaryItems%2FNSIRD_screencaptureui_WvUvFg%2FScreenshot%202025-07-08%20at%2022.22.23.png)
+![investor_commitments.png](investor_commitments.png)
 
 # Limitations
 ## Data Size
