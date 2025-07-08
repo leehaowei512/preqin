@@ -17,7 +17,6 @@ const InvestorsTable = () => {
   const [investors, setInvestors] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [order, setOrder] = useState('asc');
   const [orderBy, setOrderBy] = useState('investor_name');
   const navigate = useNavigate();
 
@@ -35,19 +34,13 @@ const InvestorsTable = () => {
     loadInvestors();
   }, []);
 
-  const handleRequestSort = (property) => {
-    const isAsc = orderBy === property && order === 'asc';
-    setOrder(isAsc ? 'desc' : 'asc');
-    setOrderBy(property);
-  };
-
   const handleNameClick = (investorName) => {
     navigate(`/investor/${encodeURIComponent(investorName)}`);
   };
 
   const sortedInvestors = [...investors].sort((a, b) => {
     const compare = a[orderBy].localeCompare(b[orderBy]);
-    return order === 'asc' ? compare : -compare;
+    return compare;
   });
 
   if (loading) return <Typography align="center" py={4}>Loading...</Typography>;
@@ -62,13 +55,7 @@ const InvestorsTable = () => {
           <TableHead>
             <TableRow sx={{ backgroundColor: '#f5f5f5' }}>
               <TableCell>
-                <TableSortLabel
-                  active={orderBy === 'investor_name'}
-                  direction={orderBy === 'investor_name' ? order : 'asc'}
-                  onClick={() => handleRequestSort('investor_name')}
-                >
-                  Name
-                </TableSortLabel>
+                Name
               </TableCell>
               <TableCell>Type</TableCell>
               <TableCell>Date Added</TableCell>
