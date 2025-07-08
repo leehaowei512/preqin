@@ -13,7 +13,7 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useParams, useNavigate } from 'react-router-dom';
 import { fetchInvestorCommitments, fetchInvestorSummary } from '../api/investorApi';
 import { formatAmount } from '../utils/formatUtils';
-import InvestorCommitmentSummaryButtons from '../component/investorCommitmentSummaryButtonGroup';
+import InvestorCommitmentSummaryButtons from '../component/investorCommitmentSummaryButtons';
 
 const InvestorCommitments = () => {
   const { investor_name } = useParams();

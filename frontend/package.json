@@ -8,7 +8,6 @@
     "@mui/icons-material": "^7.2.0",
     "@mui/material": "^7.2.0",
     "@testing-library/dom": "^10.4.0",
-    "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^16.3.0",
     "@testing-library/user-event": "^13.5.0",
     "axios": "^1.10.0",
@@ -43,6 +42,19 @@
       "last 1 chrome version",
       "last 1 firefox version",
       "last 1 safari version"
+    ]
+  },
+  "devDependencies": {
+    "@testing-library/jest-dom": "^6.6.3",
+    "axios-mock-adapter": "^2.1.0",
+    "jest": "^27.5.1"
+  },
+  "jest": {
+    "transform": {
+      "^.+\\.[t|j]sx?$": "babel-jest"
+    },
+    "transformIgnorePatterns": [
+      "node_modules/(?!axios)"
     ]
   }
 }

@@ -10,7 +10,7 @@ function App() {
         <Routes>
           <Route path="/investors" element={<Investors />} />
           <Route path="/" element={<Investors />} />
-          <Route path="/investor/:investor_name" element={<InvestorCommitments />} />
+          <Route path="/commitments/:investor_name" element={<InvestorCommitments />} />
         </Routes>
       </div>
     </Router>

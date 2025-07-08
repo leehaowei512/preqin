@@ -9,14 +9,14 @@ export const fetchInvestors = async () => {
 
 export const fetchInvestorCommitments = async (investorName) => {
   const response = await axios.get(
-    `${API_BASE_URL}/investor_name/${encodeURIComponent(investorName)}`
+    `${API_BASE_URL}/commitments?investor_name=${encodeURIComponent(investorName)}`
   );
   return response.data;
 };
 
 export const fetchInvestorSummary = async (investorName) => {
   const response = await axios.get(
-    `${API_BASE_URL}/investor_name/${encodeURIComponent(investorName)}/summary`
+    `${API_BASE_URL}/commitments/summary?investor_name=${encodeURIComponent(investorName)}`
   );
   return response.data;
 };

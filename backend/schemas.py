@@ -10,7 +10,7 @@ class GetInvestorSummary(BaseModel):
     commitment_amount: int
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class GetInvestorCommitments(BaseModel):
@@ -20,7 +20,7 @@ class GetInvestorCommitments(BaseModel):
     commitment_amount: int
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class GetInvestorCommitmentSummary(BaseModel):
@@ -28,4 +28,4 @@ class GetInvestorCommitmentSummary(BaseModel):
     amount: int
 
     class Config:
-        orm_mode = True
+        from_attributes = True

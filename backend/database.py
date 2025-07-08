@@ -1,13 +1,14 @@
-from config import Config
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
+
+from config import Config
 
 DB_NAME = Config.DB_NAME
 USER_NAME = Config.DB_USER
 DB_HOST = Config.DB_HOST
 
-SQLALCHEMY_DATABASE_URL = f'postgresql://{USER_NAME}:Bright#1270@{DB_HOST}/{DB_NAME}'
+SQLALCHEMY_DATABASE_URL = f"postgresql://{USER_NAME}:Bright#1270@{DB_HOST}/{DB_NAME}"
 
 engine = create_engine(SQLALCHEMY_DATABASE_URL)
 
