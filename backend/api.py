@@ -1,6 +1,6 @@
 from typing import List
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy import func, literal, union_all
 from sqlalchemy.orm import Session
 from starlette import status
@@ -45,14 +45,17 @@ def get_investor_summary(db: Session = Depends(get_db)):
 
 
 @router.get(
-    "/investor_name/{investor_name}",
+    "/commitments",
     status_code=status.HTTP_200_OK,
     response_model=List[schemas.GetInvestorCommitments],
 )
-def get_all_commitments_for_investor(investor_name: str, db: Session = Depends(get_db)):
+def get_all_commitments_for_investor(
+        investor_name: str = Query(..., description="Name of the investor to filter by"),
+        db: Session = Depends(get_db)
+):
     """
     Given investor name, get all commitments
-    :param investor_name: str
+    :param investor_name: str (query parameter)
     :param db:
     :return:
     """
@@ -67,25 +70,26 @@ def get_all_commitments_for_investor(investor_name: str, db: Session = Depends(g
         .all()
     )
 
-    if investor_commitments is None:
+    if not investor_commitments:  # Check for empty list instead of None
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"The investor with name: {investor_name} you requested for does not exist",
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"No commitments found for investor: {investor_name}",
         )
     return investor_commitments
 
 
 @router.get(
-    "/investor_name/{investor_name}/summary",
+    "/commitments/summary",
     status_code=status.HTTP_200_OK,
     response_model=List[schemas.GetInvestorCommitmentSummary],
 )
 def get_all_commitment_summary_for_investor(
-    investor_name: str, db: Session = Depends(get_db)
+        investor_name: str = Query(..., description="Name of the investor to filter by"),
+        db: Session = Depends(get_db)
 ):
     """
     Given investor name, get all commitments grouped by asset classes
-    :param investor_name:
+    :param investor_name: str (query parameter)
     :param db:
     :return:
     """
@@ -95,23 +99,17 @@ def get_all_commitment_summary_for_investor(
             models.Investor.commitment_asset_class.label("asset_class"),
             func.sum(models.Investor.commitment_amount).label("amount"),
         )
-        .filter(models.Investor.investor_name == "Cza Weasley fund")
+        .filter(models.Investor.investor_name == investor_name)  # Fixed hardcoded value
         .group_by(models.Investor.commitment_asset_class)
     )
-
-    if asset_class_query is None:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"The asset_class_query with name: {investor_name} you requested for does not exist",
-        )
 
     # Second query - total across all asset classes
     total_query = db.query(
         literal("all").label("asset_class"),
         func.sum(models.Investor.commitment_amount).label("amount"),
-    ).filter(models.Investor.investor_name == "Cza Weasley fund")
+    ).filter(models.Investor.investor_name == investor_name)  # Fixed hardcoded value
 
-    # Combine with UNION ALL (more efficient than UNION in this case)
+    # Combine with UNION ALL
     combined_query = union_all(asset_class_query, total_query)
 
     # Execute the combined query with ordering
@@ -119,4 +117,9 @@ def get_all_commitment_summary_for_investor(
         combined_query.order_by(combined_query.selected_columns.amount.desc())
     ).fetchall()
 
+    if not results:  # Check for empty results
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"No commitment summary found for investor: {investor_name}",
+        )
     return results
