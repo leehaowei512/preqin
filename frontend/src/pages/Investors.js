@@ -33,7 +33,7 @@ const InvestorsTable = () => {
   }, []);
 
   const handleNameClick = (investorName) => {
-    navigate(`/investor/${encodeURIComponent(investorName)}`);
+    navigate(`/commitments/${encodeURIComponent(investorName)}`);
   };
 
   const sortedInvestors = [...investors].sort((a, b) => {
