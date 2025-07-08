@@ -6,7 +6,6 @@ import {
   TableHead,
   TableRow,
   Paper,
-  TableSortLabel,
   Typography
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
@@ -17,7 +16,6 @@ const InvestorsTable = () => {
   const [investors, setInvestors] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [orderBy, setOrderBy] = useState('investor_name');
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -39,7 +37,7 @@ const InvestorsTable = () => {
   };
 
   const sortedInvestors = [...investors].sort((a, b) => {
-    const compare = a[orderBy].localeCompare(b[orderBy]);
+    const compare = a.investor_name.localeCompare(b.investor_name);
     return compare;
   });
 
