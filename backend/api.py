@@ -50,8 +50,8 @@ def get_investor_summary(db: Session = Depends(get_db)):
     response_model=List[schemas.GetInvestorCommitments],
 )
 def get_all_commitments_for_investor(
-        investor_name: str = Query(..., description="Name of the investor to filter by"),
-        db: Session = Depends(get_db)
+    investor_name: str = Query(..., description="Name of the investor to filter by"),
+    db: Session = Depends(get_db),
 ):
     """
     Given investor name, get all commitments
@@ -84,8 +84,8 @@ def get_all_commitments_for_investor(
     response_model=List[schemas.GetInvestorCommitmentSummary],
 )
 def get_all_commitment_summary_for_investor(
-        investor_name: str = Query(..., description="Name of the investor to filter by"),
-        db: Session = Depends(get_db)
+    investor_name: str = Query(..., description="Name of the investor to filter by"),
+    db: Session = Depends(get_db),
 ):
     """
     Given investor name, get all commitments grouped by asset classes
@@ -107,7 +107,9 @@ def get_all_commitment_summary_for_investor(
     total_query = db.query(
         literal("all").label("asset_class"),
         func.sum(models.Investor.commitment_amount).label("amount"),
-    ).filter(models.Investor.investor_name == investor_name)  # Fixed hardcoded value
+    ).filter(
+        models.Investor.investor_name == investor_name
+    )  # Fixed hardcoded value
 
     # Combine with UNION ALL
     combined_query = union_all(asset_class_query, total_query)
