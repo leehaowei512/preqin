@@ -3,10 +3,18 @@ Problem statement:
 https://bitbucket.org/preqindevelopment/preqin-fullstack-interview-task/src/main/
 
 # Architecture
-- Backend: Postgres DMBS
-- ORM: sqlAlchemy
+![architecture_diagram.png](architecture_diagram.png)
+- Database: Postgres
+= ORM: SQLAlchemy
 - API: FastAPI
-- Frontend: React, JavaScript
+- Server: Local network hosting
+- ASGI (Asynchronous Server Gateway Interface) Server: uvicorn
+- Frontend: React + JavaScript
+
+## Development
+- Dependency management: poetry
+- Language: Python + JavaScript
+
 
 # Usage
 ## Virtual Environment
@@ -56,8 +64,19 @@ REACT_APP_API_BASE_URL=http://localhost:8000
 ![investor_commitments.png](investor_commitments.png)
 
 # Limitations
-## Data Size
-There is no pagination/search capabilities, as it is designed for the current data.csv size
+## Scalability
+There is no pagination/search capabilities, as it is designed for the current data.csv size. Increasing the data size will lead to problems.
 
 ## Testing
-There is limited coverage, did not cover main pages
+### front end
+- limited coverage
+- Covered: components, util functions
+- Not covered: main pages, E2E testing (e.g. Selenium)
+
+### backend
+- limited coverage
+- Covered: fastapis
+- Not covered: models, schemas, setup, database, ...
+
+## Deployment/Portability
+Currently only done through local, therefore lacks in CICD, containerization, kubernetes, ...
